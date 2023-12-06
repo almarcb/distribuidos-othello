@@ -1,33 +1,12 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 
 public class Tablero {
-	// --- Códigos de colores ---
-	
-	private static final String RED = "\u001B[31m";
-	private static final String BLUE = "\u001B[34m";
-	private static final String CYAN = "\u001B[36m";
-	public static final String BLACK = "\u001B[30m";
-	public static final String WHITE = "\u001B[37m";
-	
-	public static final String RED_BOLD = "\033[1;31m";
-	public static final String CYAN_BOLD="\033[1;36m";
-	
-	
-	public static final String WHITE_BG ="\u001B[47m";
-	private static final String RED_BG = "\033[41m";
-	private static final String BLUE_BG = "\033[44m";
-	private static final String BLACK_BG= "\033[40m";
-	private static final String PURPLE_BG = "\033[45m";
-	public static final String CYAN_BG = "\u001B[46m";
-	
-	private static final String RESET = "\u001B[0m";
-	
-	// ---------------------------
+
 	
 	private static final int VACIA =3;
 	private static final int DISPONIBLE =4;
@@ -38,13 +17,14 @@ public class Tablero {
 
 	
 	public Tablero() {
-		this.turn=0;
 		loadPosicionInicial();
 	}
 	
 	
 	private void loadPosicionInicial() {
 		Arrays.fill(this.casillas, VACIA);
+		
+		this.turn=0;
 		
 		this.casillas[3*8+3]=1;
 		this.casillas[4*8+4]=1;
@@ -60,7 +40,7 @@ public class Tablero {
 	private void calcularCasillasDisponibles() {
 		int jugadorActivo = getJugadorActivo();
 		int jugadorOponente = getJugadorOponente();
-		int x, y;
+		int col, row;
 		
 		// Primero se borran las casillas disponibles del turno anterior
 		for(int i=0;i<64;i++) {
@@ -79,211 +59,211 @@ public class Tablero {
 				// Todas las comprobaciones direccionales siguen el mismo esquema
 				
 				// Diagonal superior izquierda
-				x= i/8;
-				y= i%8;
-				while(x!=0 && y!=0 && casillas[(x-1)*8+y-1]==jugadorOponente) { // Se comprueba si se ha llegado al borde o si la siguiente casilla por esa dirección está reclamada por el jugador opuesto
-					x--;
-					y--; // Se avanza a la siguiente casilla
+				col= i/8;
+				row= i%8;
+				while(col!=0 && row!=0 && casillas[(col-1)*8+row-1]==jugadorOponente) { // Se comprueba si se ha llegado al borde o si la siguiente casilla por esa dirección está reclamada por el jugador opuesto
+					col--;
+					row--; // Se avanza a la siguiente casilla
 					
-					if(x!=0 && y!=0 && casillas[(x-1)*8+y-1]==VACIA) { // Si la siguiente casilla está dentro del tablero y es vacía, se marca como disponible 
-						casillas[(x-1)*8+(y-1)]=DISPONIBLE;
+					if(col!=0 && row!=0 && casillas[(col-1)*8+row-1]==VACIA) { // Si la siguiente casilla está dentro del tablero y es vacía, se marca como disponible 
+						casillas[(col-1)*8+(row-1)]=DISPONIBLE;
 					}
 				}
 				
 				// Vertical superior
-				x= i/8;
-				y= i%8;
-				while(x!=0 && casillas[(x-1)*8+y]==jugadorOponente) { 
-					x--;
+				col= i/8;
+				row= i%8;
+				while(col!=0 && casillas[(col-1)*8+row]==jugadorOponente) { 
+					col--;
 					
-					if(x!=0 && casillas[(x-1)*8+y]==VACIA) {  
-						casillas[(x-1)*8+y]=DISPONIBLE;
+					if(col!=0 && casillas[(col-1)*8+row]==VACIA) {  
+						casillas[(col-1)*8+row]=DISPONIBLE;
 					}
 				}
 				
 				// Diagonal superior derecha
-				x= i/8;
-				y= i%8;
-				while(x!=0 && y!=7 && casillas[(x-1)*8+y+1]==jugadorOponente) { 
-					x--;
-					y++;
+				col= i/8;
+				row= i%8;
+				while(col!=0 && row!=7 && casillas[(col-1)*8+row+1]==jugadorOponente) { 
+					col--;
+					row++;
 					
-					if(x!=0 && y!=7 && casillas[(x-1)*8+y+1]==VACIA) {  
-						casillas[(x-1)*8+y+1]=DISPONIBLE;
+					if(col!=0 && row!=7 && casillas[(col-1)*8+row+1]==VACIA) {  
+						casillas[(col-1)*8+row+1]=DISPONIBLE;
 					}
 				}
 				
 				// Horizontal izquierda
-				x= i/8;
-				y= i%8;
-				while(y!=0 && casillas[x*8+y-1]==jugadorOponente) { 
-					y--;
+				col= i/8;
+				row= i%8;
+				while(row!=0 && casillas[col*8+row-1]==jugadorOponente) { 
+					row--;
 					
-					if(y!=0 && casillas[x*8+y-1]==VACIA) {
-						casillas[x*8+y-1]=DISPONIBLE;
+					if(row!=0 && casillas[col*8+row-1]==VACIA) {
+						casillas[col*8+row-1]=DISPONIBLE;
 					}
 				}
 				
 				// Horizontal derecha
-				x= i/8;
-				y= i%8;
-				while(y!=7 && casillas[x*8+y+1]==jugadorOponente) { 
-					y++;
+				col= i/8;
+				row= i%8;
+				while(row!=7 && casillas[col*8+row+1]==jugadorOponente) { 
+					row++;
 					
-					if(y!=7 && casillas[x*8+y+1]==VACIA) {
-						casillas[x*8+y+1]=DISPONIBLE;
+					if(row!=7 && casillas[col*8+row+1]==VACIA) {
+						casillas[col*8+row+1]=DISPONIBLE;
 					}
 				}
 				
 				// Diagonal inferior izquierda
-				x= i/8;
-				y= i%8;
-				while( x!=7 && y!=0 && casillas[(x+1)*8+y-1]==jugadorOponente) {
-					x++;
-					y--;
+				col= i/8;
+				row= i%8;
+				while( col!=7 && row!=0 && casillas[(col+1)*8+row-1]==jugadorOponente) {
+					col++;
+					row--;
 					
-					if( x!=7 && y!=0 && casillas[(x+1)*8+y-1]==VACIA) {
-						casillas[(x+1)*8+y-1]=DISPONIBLE;
+					if( col!=7 && row!=0 && casillas[(col+1)*8+row-1]==VACIA) {
+						casillas[(col+1)*8+row-1]=DISPONIBLE;
 					}
 				}
 				
 				// Vertical inferior 
-				x= i/8;
-				y= i%8;
-				while(x!=7 && casillas[(x+1)*8+y]==jugadorOponente) { 
-					x++;
+				col= i/8;
+				row= i%8;
+				while(col!=7 && casillas[(col+1)*8+row]==jugadorOponente) { 
+					col++;
 					
-					if(x!=7 && casillas[(x+1)*8+y]==VACIA) {  
-						casillas[(x+1)*8+y]=DISPONIBLE;
+					if(col!=7 && casillas[(col+1)*8+row]==VACIA) {  
+						casillas[(col+1)*8+row]=DISPONIBLE;
 					}
 				}
 				
 				// Diagonal inferior derecha
-				x= i/8;
-				y= i%8;
-				while( x!=7 && y!=7 && casillas[(x+1)*8+y+1]==jugadorOponente) {
-					x++;
-					y++;
+				col= i/8;
+				row= i%8;
+				while( col!=7 && row!=7 && casillas[(col+1)*8+row+1]==jugadorOponente) {
+					col++;
+					row++;
 					
-					if( x!=7 && y!=7 && casillas[(x+1)*8+y+1]==VACIA) {
-						casillas[(x+1)*8+y+1]=DISPONIBLE;
+					if( col!=7 && row!=7 && casillas[(col+1)*8+row+1]==VACIA) {
+						casillas[(col+1)*8+row+1]=DISPONIBLE;
 					}
 				}
 			}
 		}
 	}
 	
-	public boolean reclamarCasilla(int x, int y) {
+	public boolean reclamarCasilla(int col, int row) {
 		int jugadorActivo = getJugadorActivo();
 		int jugadorOponente = getJugadorOponente();
 		
-		int xtemp=x;
-		int ytemp=y;
+		int coltemp=col;
+		int rowtemp=row;
 		
-		if(x>=0 && x<=7 && y>=0 && y<=7 && this.casillas[x*8+y]==DISPONIBLE) {
-			this.casillas[x*8+y] = jugadorActivo;
+		if(col>=0 && col<=7 && row>=0 && row<=7 && this.casillas[col*8+row]==DISPONIBLE) {
+			this.casillas[col*8+row] = jugadorActivo;
 			
 			
 			// Se sigue un proceso similar al del calculo de casillas disponibles para capturar las casillas flanqueadas
 			
-			List<Integer> reclamadas = new ArrayList<Integer>();
-			List<Integer> aReclamar = new ArrayList<Integer>();
+			List<Integer> reclamadas = new LinkedList<Integer>();
+			List<Integer> aReclamar = new LinkedList<Integer>();
 			
 			// Diagnoal superior izquierda
-			while(x!=0 && y!=0 && casillas[(x-1)*8+y-1]==jugadorOponente) { 
-				x--;
-				y--; // Se avanza a la siguiente casilla
+			while(col!=0 && row!=0 && casillas[(col-1)*8+row-1]==jugadorOponente) { 
+				col--;
+				row--; // Se avanza a la siguiente casilla
 				
-				aReclamar.add(x*8+y);
+				aReclamar.add(col*8+row);
 				
-				if(x!=0 && y!=0 && casillas[(x-1)*8+y-1]==jugadorActivo) {  
+				if(col!=0 && row!=0 && casillas[(col-1)*8+row-1]==jugadorActivo) {  
 					reclamadas.addAll(aReclamar);
 				}
 			}
 			
 			// Vertical superior
 			aReclamar.clear();
-			x= xtemp;
-			y= ytemp;
-			while(x!=0 && casillas[(x-1)*8+y]==jugadorOponente) { 
-				x--;
-				aReclamar.add(x*8+y);
-				if(x!=0 && casillas[(x-1)*8+y]==jugadorActivo) {  
+			col= coltemp;
+			row= rowtemp;
+			while(col!=0 && casillas[(col-1)*8+row]==jugadorOponente) { 
+				col--;
+				aReclamar.add(col*8+row);
+				if(col!=0 && casillas[(col-1)*8+row]==jugadorActivo) {  
 					reclamadas.addAll(aReclamar);
 				}
 			}
 			
 			// Diagonal superior derecha
 			aReclamar.clear();
-			x= xtemp;
-			y= ytemp;
-			while(x!=0 && y!=7 && casillas[(x-1)*8+y+1]==jugadorOponente) { 
-				x--;
-				y++;
-				aReclamar.add(x*8+y);
-				if(x!=0 && y!=7 && casillas[(x-1)*8+y+1]==jugadorActivo) {  
+			col= coltemp;
+			row= rowtemp;
+			while(col!=0 && row!=7 && casillas[(col-1)*8+row+1]==jugadorOponente) { 
+				col--;
+				row++;
+				aReclamar.add(col*8+row);
+				if(col!=0 && row!=7 && casillas[(col-1)*8+row+1]==jugadorActivo) {  
 					reclamadas.addAll(aReclamar);
 				}
 			}
 			
 			// Horizontal izquierda
 			aReclamar.clear();
-			x= xtemp;
-			y= ytemp;
-			while(y!=0 && casillas[x*8+y-1]==jugadorOponente) { 
-				y--;
-				aReclamar.add(x*8+y);
-				if(y!=0 && casillas[x*8+y-1]==jugadorActivo) {
+			col= coltemp;
+			row= rowtemp;
+			while(row!=0 && casillas[col*8+row-1]==jugadorOponente) { 
+				row--;
+				aReclamar.add(col*8+row);
+				if(row!=0 && casillas[col*8+row-1]==jugadorActivo) {
 					reclamadas.addAll(aReclamar);
 				}
 			}
 			
 			// Horizontal derecha
 			aReclamar.clear();
-			x= xtemp;
-			y= ytemp;
-			while(y!=7 && casillas[x*8+y+1]==jugadorOponente) { 
-				y++;
-				aReclamar.add(8*x+y);
-				if(y!=7 && casillas[x*8+y+1]==jugadorActivo) {
+			col= coltemp;
+			row= rowtemp;
+			while(row!=7 && casillas[col*8+row+1]==jugadorOponente) { 
+				row++;
+				aReclamar.add(8*col+row);
+				if(row!=7 && casillas[col*8+row+1]==jugadorActivo) {
 					reclamadas.addAll(aReclamar);
 				}
 			}
 			
 			// Diagonal inferior izquierda
 			aReclamar.clear();
-			x= xtemp;
-			y= ytemp;
-			while( x!=7 && y!=0 && casillas[(x+1)*8+y-1]==jugadorOponente) {
-				x++;
-				y--;
-				aReclamar.add(x*8+y);
-				if( x!=7 && y!=0 && casillas[(x+1)*8+y-1]==jugadorActivo) {
+			col= coltemp;
+			row= rowtemp;
+			while( col!=7 && row!=0 && casillas[(col+1)*8+row-1]==jugadorOponente) {
+				col++;
+				row--;
+				aReclamar.add(col*8+row);
+				if( col!=7 && row!=0 && casillas[(col+1)*8+row-1]==jugadorActivo) {
 					reclamadas.addAll(aReclamar);
 				}
 			}
 			
 			// Vertical inferior
 			aReclamar.clear();
-			x= xtemp;
-			y= ytemp;
-			while(x!=7 && casillas[(x+1)*8+y]==jugadorOponente) { 
-				x++;
-				aReclamar.add(x*8+y);
-				if(x!=7 && casillas[(x+1)*8+y]==jugadorActivo) {  
+			col= coltemp;
+			row= rowtemp;
+			while(col!=7 && casillas[(col+1)*8+row]==jugadorOponente) { 
+				col++;
+				aReclamar.add(col*8+row);
+				if(col!=7 && casillas[(col+1)*8+row]==jugadorActivo) {  
 					reclamadas.addAll(aReclamar);
 				}
 			}
 			
 			// Diagonal inferior derecha
 			aReclamar.clear();
-			x= xtemp;
-			y= ytemp;
-			while( x!=7 && y!=7 && casillas[(x+1)*8+y+1]==jugadorOponente) {
-				x++;
-				y++;
-				aReclamar.add(x*8+y);
-				if( x!=7 && y!=7 && casillas[(x+1)*8+y+1]==jugadorActivo) {
+			col= coltemp;
+			row= rowtemp;
+			while( col!=7 && row!=7 && casillas[(col+1)*8+row+1]==jugadorOponente) {
+				col++;
+				row++;
+				aReclamar.add(col*8+row);
+				if( col!=7 && row!=7 && casillas[(col+1)*8+row+1]==jugadorActivo) {
 					reclamadas.addAll(aReclamar);
 				}
 			}
@@ -361,11 +341,11 @@ public class Tablero {
 				
 				if(casillas[i*8+j]==0) {
 					tablero.append("|");
-					tablero.append(RED_BG);
+					tablero.append(Colores.RED_BG);
 					tablero.append("   ");
 				}else if(casillas[i*8+j]==1) {
 					tablero.append("|");
-					tablero.append(CYAN_BG);
+					tablero.append(Colores.CYAN_BG);
 					tablero.append("   ");
 				}else if(casillas[i*8+j]==DISPONIBLE) {
 					tablero.append("|");
@@ -374,21 +354,26 @@ public class Tablero {
 					tablero.append("|");
 					tablero.append("   ");
 				}
-				tablero.append(RESET);
+				tablero.append(Colores.RESET);
 			}
 			tablero.append("||\r\n");
 		}
 		tablero.append("+---++---+---+---+---+---+---+---+---++\r\n");
 		tablero.append("         |>-----<|");
-		tablero.append(" ");
-		tablero.append(RED_BOLD);
+		
+		if(puntuacion[0]<10) { // Si la puntuacion es menos de 10, se necesita solo un caracter para mostrarla y hay que añadir un espacio para el display
+			tablero.append(" ");
+		}
+		tablero.append(Colores.RED_BOLD);
 		tablero.append(puntuacion[0]);
-		tablero.append(WHITE);
+		tablero.append(Colores.WHITE);
 		tablero.append(" - ");
-		tablero.append(CYAN_BOLD);
+		tablero.append(Colores.CYAN_BOLD);
 		tablero.append(puntuacion[1]);
-		tablero.append(" ");
-		tablero.append(RESET);
+		if(puntuacion[1]<10) {
+			tablero.append(" ");
+		}
+		tablero.append(Colores.RESET);
 		tablero.append("|>-----<|\n");
 		return tablero.toString();
 	}

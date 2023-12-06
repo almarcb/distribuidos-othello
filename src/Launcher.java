@@ -19,9 +19,9 @@ public class Launcher {
 				
 				do {
 					try {
-						System.out.print("Seleccione la posición x: ");
+						System.out.print("Seleccione la fila: ");
 						x=Integer.parseInt(scan.nextLine()); // El método next int da problemas
-						System.out.print("Seleccione la posición y: ");
+						System.out.print("Seleccione la columna: ");
 						y=Integer.parseInt(scan.nextLine());
 					}catch(NumberFormatException e) {
 						x=8;y=8;
