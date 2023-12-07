@@ -17,7 +17,6 @@ public class Cliente {
 	private static int PRIMERO =4;
 	private static int SEGUNDO = 5;
 	private static int STALEMATE = 6;
-	private static int EMPATE = 7;
 	private static int JUGADA_OPONENTE =8;
 	
 	public static void main(String[] args) {
@@ -48,7 +47,7 @@ public class Cliente {
 			
 			
 			outer.writeBytes(nombre+"\r\n");
-			String oponente = iner.readLine();
+			String oponente = iner.readLine(); // El cliente queda bloqueado hasta que aparece un oponente
 			System.out.println("Partida encontrada");
 			
 			if(iner.readInt()==PRIMERO) {
@@ -58,9 +57,10 @@ public class Cliente {
 				nombres[1]=nombre;
 				nombres[0]=oponente;
 			}
-			System.out.println(Colores.RED_BOLD+nombres[0]+Colores.RESET+" vs "+Colores.CYAN_BOLD+nombres[1]+Colores.RESET);
+			System.out.println(Colores.RED_BOLD+nombres[0]+Colores.RESET+" vs "+Colores.CYAN_BOLD+nombres[1]);
+			System.out.print(Colores.RESET);
 			
-
+			// En cada turno, el jugador les envía una orden a los clientes para que lleven a cabo determinadas acciones
 			while((respuestaServidor=iner.readInt())!=FIN){
 				System.out.println(board.toString());
 				
@@ -82,17 +82,18 @@ public class Cliente {
 							System.out.println("Jugada ilegal.");
 						}
 					}while(!jugadaValida); // Validación de la jugada
-					
+						
 					outer.writeInt(col);
 					outer.writeInt(row);
 					outer.flush();
 				}else if(respuestaServidor == JUGADA_OPONENTE) {
-					System.out.println("Turno del oponente");
+					System.out.println("Turno del oponente...");
 					col = iner.readInt();
 					row = iner.readInt();
 					board.reclamarCasilla(col,row);
 				}else if(respuestaServidor == SALTAR_TURNO) {
 					System.out.println("No hay posiciones legales. Saltando turno...");
+					board.avanzarTurno();
 				}else if(respuestaServidor == STALEMATE) {
 					System.out.println("Sin movimientos posibles");
 				}
@@ -104,21 +105,26 @@ public class Cliente {
 			
 			StringBuilder sb = new StringBuilder();
 			System.out.println("Fin de la partida");
+			System.out.println(board.toString());
+			
 			sb.append(Colores.RED_BOLD);
 			sb.append(nombres[0]);
 			sb.append(": ");
+			sb.append(Colores.RESET);
 			sb.append(puntuacion[0]);
 			sb.append("\r\n");
+			sb.append(Colores.RESET);
 			sb.append(Colores.CYAN_BOLD);
 			sb.append(nombres[1]);
 			sb.append(": ");
+			sb.append(Colores.RESET);
 			sb.append(puntuacion[1]);
 			sb.append(Colores.RESET);
 			System.out.println(sb.toString());
 			
 			if(puntuacion[0]>puntuacion[1]) {
 				System.out.println("Ganador: "+nombres[0]);
-			}else if(puntuacion[0]>puntuacion[1]) {
+			}else if(puntuacion[0]<puntuacion[1]) {
 				System.out.println("Ganador: "+nombres[1]);
 			}else {
 				System.out.println("Empate");
@@ -128,6 +134,7 @@ public class Cliente {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			System.out.println("Error en el servidor");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {

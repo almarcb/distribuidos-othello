@@ -1,7 +1,7 @@
 package model;
 
 public class Colores {
-	// --- Códigos de colores ---
+	// --- Códigos ANSI para los colores de la consola ---
 	
 	private static final String RED = "\u001B[31m";
 	private static final String BLUE = "\u001B[34m";
@@ -22,5 +22,4 @@ public class Colores {
 	
 	public static final String RESET = "\u001B[0m";
 	
-	// ---------------------------
 }

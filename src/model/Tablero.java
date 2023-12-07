@@ -6,8 +6,6 @@ import java.util.List;
 
 
 public class Tablero {
-
-	
 	private static final int VACIA =3;
 	private static final int DISPONIBLE =4;
 	
@@ -15,34 +13,33 @@ public class Tablero {
 	private int[] casillas = new int[64];
 	private int turn;
 
-	
+	// Método constructor
 	public Tablero() {
 		loadPosicionInicial();
 	}
 	
-	
+	// Carga la posición inicial del tablero
 	private void loadPosicionInicial() {
 		Arrays.fill(this.casillas, VACIA);
-		
 		this.turn=0;
 		
 		this.casillas[3*8+3]=1;
 		this.casillas[4*8+4]=1;
-		
 		this.casillas[3*8+4]=0;
 		this.casillas[4*8+3]=0;
 		
 		this.calcularCasillasDisponibles();
 	}
 	
+	// Calcula las casillas que puede reclamar el jugador activo.
 	// Solo se pueden reclamar casillas en las cuales haya al menos una 
 	// línea horizontal, vertical o diagonal ocupada entre la nueva casilla y otra casilla de ese jugador
-	private void calcularCasillasDisponibles() {
+	private void calcularCasillasDisponibles() {	
 		int jugadorActivo = getJugadorActivo();
 		int jugadorOponente = getJugadorOponente();
 		int col, row;
 		
-		// Primero se borran las casillas disponibles del turno anterior
+		// Primero se borran las casillas disponibles del jugador anterior
 		for(int i=0;i<64;i++) {
 			if(casillas[i]==DISPONIBLE) {
 				casillas[i]=VACIA;
@@ -53,10 +50,8 @@ public class Tablero {
 			if(casillas[i]==jugadorActivo) {
 				// Una vez detectada una casilla reclamada por el jugador activo se comprueban en
 				// las 8 direcciones cardinales a ver si hay una línea de casillas reclamadas
-				// por el jugador opuesto. Al final de esas líneas se hallarán las casillas disponibles
-
-				
-				// Todas las comprobaciones direccionales siguen el mismo esquema
+				// por el jugador opuesto. Al final de esas líneas se hallarán las casillas disponibles.	
+				// Todas las comprobaciones direccionales siguen el mismo esquema.
 				
 				// Diagonal superior izquierda
 				col= i/8;
@@ -153,9 +148,12 @@ public class Tablero {
 		}
 	}
 	
+	// Reclama una casilla. Devuelve cierto si la reclamación es exitosa y falso en caso contrario, i.e., si la casilla 
+	// no está disponible o está out of bounds
 	public boolean reclamarCasilla(int col, int row) {
 		int jugadorActivo = getJugadorActivo();
 		int jugadorOponente = getJugadorOponente();
+		
 		
 		int coltemp=col;
 		int rowtemp=row;
@@ -163,16 +161,16 @@ public class Tablero {
 		if(col>=0 && col<=7 && row>=0 && row<=7 && this.casillas[col*8+row]==DISPONIBLE) {
 			this.casillas[col*8+row] = jugadorActivo;
 			
-			
+			// Tras reclamar una casilla, se reclaman también todas las casillas enemigas flanqueadas
 			// Se sigue un proceso similar al del calculo de casillas disponibles para capturar las casillas flanqueadas
 			
 			List<Integer> reclamadas = new LinkedList<Integer>();
 			List<Integer> aReclamar = new LinkedList<Integer>();
 			
-			// Diagnoal superior izquierda
+			// Diagonal superior izquierda
 			while(col!=0 && row!=0 && casillas[(col-1)*8+row-1]==jugadorOponente) { 
 				col--;
-				row--; // Se avanza a la siguiente casilla
+				row--; 
 				
 				aReclamar.add(col*8+row);
 				
@@ -290,7 +288,7 @@ public class Tablero {
 		this.turn++;
 		this.calcularCasillasDisponibles();
 	}
-
+	
 	public boolean existenCasillasDisponibles() {
 		for(int i=0;i<64;i++) {
 			if(this.casillas[i]==DISPONIBLE) {
@@ -300,6 +298,7 @@ public class Tablero {
 		return false;
 	}
 	
+	// Comprueba si el tablero aún no se ha llenado
 	public boolean existenCasillasVacías() {
 		for(int i=0;i<64;i++) {
 			if(this.casillas[i]==VACIA || this.casillas[i]==DISPONIBLE) {
@@ -309,10 +308,10 @@ public class Tablero {
 		return false;
 	}
 	
+	// Devuelve la puntuación de ambos jugadores
 	public int[] getPuntuacion() {
 		int rojas=0;
 		int azules=0;
-		
 		
 		for(int i=0;i<64;i++) {
 			if(this.casillas[i]==0) {
@@ -324,10 +323,12 @@ public class Tablero {
 		return new int[]{rojas,azules};
 	}
 	
+	
 	public String toString() {
 		
 		int[] puntuacion= this.getPuntuacion();
 		StringBuilder tablero = new StringBuilder();
+		tablero.append("\r\n");
 		tablero.append("                 _________            \r\n");
 		tablero.append("     +---+---+-->|Othello|<--+---+---+\r\n");
 		tablero.append("     +---+---+---+-------+---+---+---+\r\n");
@@ -361,6 +362,7 @@ public class Tablero {
 		tablero.append("+---++---+---+---+---+---+---+---+---++\r\n");
 		tablero.append("         |>-----<|");
 		
+		//tablero.append(Colores.WHITE_BG);
 		if(puntuacion[0]<10) { // Si la puntuacion es menos de 10, se necesita solo un caracter para mostrarla y hay que añadir un espacio para el display
 			tablero.append(" ");
 		}

@@ -18,7 +18,6 @@ public class Partida extends Thread{
 	private static int PRIMERO =4;
 	private static int SEGUNDO = 5;
 	private static int STALEMATE = 6;
-	private static int EMPATE = 7;
 	private static int JUGADA_OPONENTE =8;
 	
 	public Partida(Socket jugador1, Socket jugador2) {
@@ -45,7 +44,7 @@ public class Partida extends Thread{
 			DataOutputStream[] outer = {outer0,outer1};
 			String[] nombre = new String[2];
 			
-			for(int i=0;i<2;i++) {
+			for(int i=0;i<2;i++) { // Pide a cada cliente su nombre
 				nombre[i] = iner[i].readLine();
 			}
 			
@@ -55,10 +54,13 @@ public class Partida extends Thread{
 			
 			outer[0].writeInt(PRIMERO);
 			outer[1].writeInt(SEGUNDO);
+			for(int i=0;i<2;i++) {
+				outer[i].flush();
+			}
 			
 			int col, row;
 			int jugadorActivo,jugadorOponente;
-			while(board.existenCasillasVacías()) {
+			while(board.existenCasillasVacías()) { // Mientras el tablero aún no se haya llenado
 				jugadorActivo = board.getJugadorActivo();
 				jugadorOponente= board.getJugadorOponente();
 				
@@ -73,10 +75,11 @@ public class Partida extends Thread{
 					
 					outer[jugadorOponente].writeInt(col);
 					outer[jugadorOponente].writeInt(row);
-				}else {
+				}else { // Si un jugador no tiene casillas disponibles se le salta el turno
 					outer[jugadorActivo].writeInt(SALTAR_TURNO);
+					outer[jugadorOponente].writeInt(SALTAR_TURNO);
 					board.avanzarTurno();
-					if(!board.existenCasillasDisponibles()) { // Stalemate
+					if(!board.existenCasillasDisponibles()) { // Stalemate. Ningún jugador tiene casillas disponibles
 						for(int i=0;i<2;i++) {
 							outer[i].writeInt(STALEMATE);
 						}
@@ -87,13 +90,13 @@ public class Partida extends Thread{
 				
 			int[] puntuacion = board.getPuntuacion();
 			
-			
 			for(int i=0;i<2;i++) {
 				outer[i].writeInt(FIN);
-				for(int j=0;i<2;j++) {
+				for(int j=0;j<2;j++) {
 					outer[i].writeInt(puntuacion[j]);
 				}
 			}
+			
 			
 		}catch(IOException e) {
 			e.printStackTrace();
